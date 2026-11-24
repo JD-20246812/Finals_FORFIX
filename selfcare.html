@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MindBridge PH: Self-Care. Mental health service directory for Baguio City (UN SDG 11).">
+  <title>Self-Care | MindBridge PH</title>
+  <style>
+/* ==========================================================
+   MindBridge PH - shared stylesheet
+   SDG 11: Sustainable Cities and Communities (Baguio City)
+   Colour scheme (all text pairs meet WCAG AA 4.5:1):
+   - Ink  #111827 on White #FFFFFF  -> 17.7:1
+   - Ink  #111827 on Slate #C9D1DB  -> 10.6:1
+   - Ink  #111827 on Rose  #E8C9CB  -> 11.4:1
+   - White #FFFFFF on Navy #1F3A5F  -> 11.2:1
+   ========================================================== */
+
+:root {
+  --ink: #111827;
+  --bg: #ffffff;
+  --panel: #f5f5f5;
+  --slate: #c9d1db;
+  --rose: #e8c9cb;
+  --navy: #1f3a5f;
+  --on-navy: #ffffff;
+  --muted: #4b5563;
+  --focus: #1d4ed8;
+  --radius: 18px;
+  --font: "Poppins", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* High-contrast mode (toggled from the settings gear) */
+body.hc {
+  --ink: #ffffff;
+  --bg: #000000;
+  --panel: #000000;
+  --slate: #000000;
+  --rose: #000000;
+  --navy: #ffd60a;
+  --on-navy: #000000;
+  --muted: #ffffff;
+  --focus: #00e5ff;
+}
+body.hc .card, body.hc .panel, body.hc .site-header,
+body.hc .hero, body.hc .nav-list a, body.hc .search input,
+body.hc .settings-panel, body.hc .facility {
+  border: 2px solid #ffffff;
+}
+
+/* Text size steps (set by JS on <html>) */
+html { font-size: 100%; }
+html.fs-2 { font-size: 118%; }
+html.fs-3 { font-size: 136%; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.6;
+}
+body.dyslexic { font-family: "Comic Sans MS", "Trebuchet MS", Verdana, sans-serif; letter-spacing: 0.03em; }
+
+img, video { max-width: 100%; height: auto; display: block; }
+a { color: var(--navy); text-underline-offset: 3px; }
+body.hc a { color: #ffd60a; }
+h1, h2, h3 { line-height: 1.25; }
+
+/* Keyboard focus is always clearly visible */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.skip-link {
+  position: absolute; left: 8px; top: -60px; z-index: 100;
+  background: var(--navy); color: var(--on-navy); padding: 10px 16px; border-radius: 8px;
+}
+.skip-link:focus { top: 8px; }
+
+/* ---------- Header / navigation ---------- */
+.site-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px;
+  padding: 12px 20px; background: var(--bg);
+  position: relative;
+}
+.search { flex: 0 1 230px; }
+.search input {
+  width: 100%; padding: 10px 18px; border: 0; border-radius: 999px;
+  background: var(--slate); color: var(--ink); font: inherit; text-align: center;
+}
+.search input::placeholder { color: var(--ink); opacity: 0.85; }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); flex: 1 1 auto; }
+.brand img { width: 52px; height: 52px; }
+.motto { font-weight: 700; font-size: 1.15rem; }
+.nav-list { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0; padding: 0; }
+.nav-list a {
+  display: block; padding: 8px 16px; border-radius: 999px;
+  background: var(--slate); color: var(--ink); text-decoration: none; font-size: 0.95rem;
+}
+.nav-list a:hover { background: var(--rose); }
+.nav-list a[aria-current="page"] { font-weight: 700; box-shadow: inset 0 0 0 2px var(--navy); }
+.menu-toggle {
+  display: none; padding: 10px 18px; border: 0; border-radius: 999px;
+  background: var(--navy); color: var(--on-navy); font: inherit; cursor: pointer;
+}
+.settings-btn {
+  width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--panel); color: var(--navy); font-size: 1.6rem;
+}
+body.hc .settings-btn { border: 2px solid #fff; }
+.settings-panel {
+  position: absolute; right: 20px; top: 76px; z-index: 50; width: min(320px, 90vw);
+  background: var(--bg); border: 2px solid var(--navy); border-radius: var(--radius);
+  padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+.settings-panel[hidden] { display: none; }
+.settings-panel h2 { margin: 0 0 8px; font-size: 1.1rem; }
+.settings-panel .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+
+/* ---------- Buttons ---------- */
+.btn, button.btn {
+  display: inline-block; padding: 10px 22px; border: 0; border-radius: 999px;
+  background: var(--navy); color: var(--on-navy); font: inherit; font-weight: 600;
+  text-decoration: none; cursor: pointer;
+}
+.btn:hover { filter: brightness(1.15); }
+.btn.secondary { background: var(--slate); color: var(--ink); }
+.btn[aria-pressed="true"] { outline: 3px solid var(--focus); outline-offset: 2px; }
+.btn[disabled] { opacity: 0.55; cursor: not-allowed; }
+
+/* ---------- Layout helpers ---------- */
+main { padding: 0 20px 40px; max-width: 1200px; margin: 0 auto; }
+.panel, .card { background: var(--panel); border-radius: var(--radius); padding: 20px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.hero {
+  border-radius: var(--radius); overflow: hidden; margin: 8px 0 20px;
+  text-align: center; background: #cdeafd; position: relative;
+}
+.hero img { width: 100%; max-height: 260px; object-fit: cover; }
+.hero-text { padding: 12px 16px 20px; background: var(--rose); color: #111827; }
+body.hc .hero-text { background: #000; color: #fff; }
+.hero-text h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.6rem); }
+.page-title {
+  background: var(--slate); border-radius: var(--radius); padding: 48px 20px;
+  text-align: center; margin: 8px 0 24px;
+}
+.page-title h1 { margin: 0; font-size: clamp(2rem, 6vw, 3.6rem); }
+.page-title p { margin: 8px auto 0; max-width: 60ch; }
+.callout {
+  background: var(--rose); color: #111827; border-radius: var(--radius); padding: 18px 22px; margin: 16px 0;
+  font-weight: 600;
+}
+body.hc .callout { background: #000; color: #fff; border: 2px solid #ffd60a; }
+.hotline { font-size: clamp(1.1rem, 2.6vw, 1.6rem); font-weight: 700; text-align: center; margin: 10px 0; }
+.hotline a { color: var(--ink); }
+body.hc .hotline a { color: #ffd60a; }
+.figure-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+figure { margin: 0; }
+figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid var(--muted); padding: 8px 10px; text-align: left; }
+th { background: var(--slate); color: var(--ink); }
+label { font-weight: 600; display: block; margin: 12px 0 4px; }
+input[type=text], input[type=email], input[type=tel], select, textarea {
+  width: 100%; padding: 10px 14px; border: 2px solid var(--muted); border-radius: 12px;
+  font: inherit; background: var(--bg); color: var(--ink);
+}
+details { background: var(--panel); border-radius: 12px; padding: 12px 16px; margin: 10px 0; }
+summary { cursor: pointer; font-weight: 600; }
+
+/* ---------- Service page (matches wireframe 1) ---------- */
+.service-layout {
+  display: grid; gap: 16px; align-items: start;
+  grid-template-columns: 250px minmax(0, 1fr) 310px;
+}
+.sidebar { max-height: 80vh; overflow-y: auto; }
+.city-pill {
+  background: var(--rose); color: #111827; border-radius: 999px;
+  text-align: center; font-size: 1.7rem; font-weight: 700; padding: 8px; margin: 12px 0;
+}
+body.hc .city-pill { background: #000; color: #fff; border: 2px solid #fff; }
+.district-btn {
+  display: flex; gap: 8px; width: 100%; align-items: center; text-align: left;
+  background: none; border: 0; padding: 8px 4px; font: inherit; color: var(--ink); cursor: pointer;
+}
+.district-btn .chev { transition: transform .2s; }
+.district-btn[aria-expanded="true"] .chev { transform: rotate(90deg); }
+.place-list { list-style: none; margin: 0 0 6px 28px; padding: 0; }
+.place-list button {
+  background: none; border: 0; padding: 4px 6px; font: inherit; font-size: 0.9rem;
+  color: var(--ink); cursor: pointer; text-decoration: underline; text-align: left;
+}
+.place-list button[aria-current="true"] { font-weight: 700; background: var(--rose); color: #111827; border-radius: 6px; }
+.results { max-height: 80vh; overflow-y: auto; }
+.results h1 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); margin-top: 0; }
+.facility { display: grid; gap: 6px; padding: 14px 8px 18px; border-bottom: 1px solid var(--slate); }
+.facility img { width: 100%; max-width: 280px; border-radius: 10px; }
+.facility h3 { margin: 0; font-size: 1.05rem; }
+.greeting { display: flex; align-items: center; gap: 12px; background: var(--panel); border-radius: 999px; padding: 8px 16px; margin-bottom: 14px; }
+.greeting img { width: 44px; height: 44px; border-radius: 50%; }
+.calendar { width: 100%; text-align: center; }
+.cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.cal-head button { background: var(--slate); border: 0; border-radius: 8px; padding: 4px 10px; cursor: pointer; font: inherit; color: var(--ink); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-grid .dow { font-size: 0.8rem; color: var(--muted); }
+.cal-grid button {
+  background: none; border: 0; border-radius: 50%; aspect-ratio: 1; font: inherit;
+  font-size: 0.85rem; cursor: pointer; color: var(--ink);
+}
+.cal-grid button:hover:not([disabled]) { background: var(--rose); color: #111827; }
+.cal-grid button[disabled] { opacity: 0.4; cursor: not-allowed; }
+.cal-grid button[aria-pressed="true"] { background: var(--navy); color: var(--on-navy); font-weight: 700; }
+.times { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 10px 0 14px; }
+.times button { border: 2px solid var(--navy); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 4px 14px; cursor: pointer; font: inherit; font-size: 0.85rem; }
+.times button[aria-pressed="true"] { background: var(--navy); color: var(--on-navy); }
+.status { min-height: 1.5em; font-weight: 600; margin-top: 10px; }
+
+/* ---------- Breathing exercise ---------- */
+.breath-wrap { display: grid; place-items: center; padding: 30px 0; }
+.breath-circle {
+  width: 160px; height: 160px; border-radius: 50%; background: var(--rose); color: #111827;
+  display: grid; place-items: center; font-weight: 700; transition: transform 4s ease-in-out;
+}
+body.hc .breath-circle { border: 3px solid #fff; background: #000; color: #fff; }
+.breath-circle.expand { transform: scale(1.5); }
+@media (prefers-reduced-motion: reduce) { .breath-circle { transition: none; } }
+
+/* ---------- Footer ---------- */
+.site-footer { background: var(--slate); padding: 24px 20px; margin-top: 30px; }
+body.hc .site-footer { border-top: 2px solid #fff; }
+.site-footer ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 0; margin: 0 0 12px; justify-content: center; }
+.site-footer a { color: var(--ink); }
+body.hc .site-footer a { color: #ffd60a; }
+.site-footer p { text-align: center; margin: 4px 0; font-size: 0.9rem; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1000px) {
+  .service-layout { grid-template-columns: 1fr; }
+  .sidebar, .results { max-height: none; }
+}
+@media (max-width: 760px) {
+  .menu-toggle { display: inline-block; }
+  .nav-wrap { width: 100%; order: 5; }
+  .nav-list { display: none; flex-direction: column; }
+  .nav-list.open { display: flex; }
+  .search { flex: 1 1 100%; order: 6; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* ---- pictures ---- */
+img.pic { width: 100%; height: auto; display: block; border-radius: 12px; }
+img.pic.small { max-width: 280px; }
+.brand img { width: 52px; height: 52px; flex: none; }
+.greeting img { width: 44px; height: 44px; border-radius: 50%; flex: none; }
+.hero-art { background: #cdeafd; }
+.hero-art img.pic { border-radius: 0; max-height: 300px; object-fit: cover; }
+.card img.pic { margin-bottom: 10px; }
+
+/* Service page: keep hotline lines compact inside the results panel */
+.results .hotline { font-size: 1.05rem; text-align: left; margin: 6px 0; }
+
+/* ---- Green header and footer (ink text on #A5D6A7 = 10.8:1) ---- */
+:root { --green: #a5d6a7; }
+body.hc { --green: #000000; }
+.site-header { background: var(--green); }
+.site-footer { background: var(--green); }
+
+/* Long web addresses wrap on small screens; long headings stay readable */
+main a, main li, main td { overflow-wrap: anywhere; }
+.results h1 { font-size: clamp(1.4rem, 2.4vw, 1.9rem); }
+
+
+/* Typed appointment time */
+.time-input { text-align: center; margin-bottom: 4px; }
+.time-input[aria-invalid="true"] { border-color: #9b1c1c; }
+body.hc .time-input[aria-invalid="true"] { border-color: #ff8a8a; }
+
+
+/* Videos page */
+.video-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.video-card { background: var(--panel); border-radius: var(--radius); padding: 14px; }
+.video-card video { width: 100%; height: auto; border-radius: 12px; background: #000; }
+.video-card h2 { font-size: 1.1rem; margin: 10px 0 4px; }
+.video-card p { margin: 4px 0; }
+.src { font-size: 0.85rem; color: var(--muted); }
+.link-list { padding-left: 1.2rem; }
+.link-list li { margin: 6px 0; }
+
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-header">
+  <form class="search" role="search" onsubmit="return false">
+    <label class="sr-only" for="site-search">Search the site</label>
+    <input id="site-search" type="search" placeholder="Search bar" autocomplete="off">
+  </form>
+  <a class="brand" href="index.html" aria-label="MindBridge PH home"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0OCIgZmlsbD0iI2M5ZDFkYiIvPjxwYXRoIGQ9Ik0yMCA2MiBRNTAgMjAgODAgNjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFmM2E1ZiIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMzAgNjJ2MTRNNzAgNjJ2MTRNMjAgNzZoNjAiIHN0cm9rZT0iIzFmM2E1ZiIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=" alt="MindBridge PH logo: a bridge arch" width="52" height="52"><span class="motto">Help is closer than you think</span></a>
+  <button class="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="nav-wrap" aria-label="Main navigation"><ul class="nav-list" id="main-nav"><li><a href="index.html">HOME</a></li><li><a href="service.html">APPOINTMENT</a></li><li><a href="about.html">ABOUT US</a></li><li><a href="help.html">HELP &amp; GUIDE</a></li><li><a href="crisis.html">CRISIS SUPPORT</a></li><li><a href="videos.html">VIDEOS</a></li><li><a href="accessibility.html">ACCESSIBILITY</a></li></ul></nav>
+  <button class="settings-btn" id="settings-btn" aria-label="Accessibility settings" aria-expanded="false" aria-controls="settings-panel">&#9881;</button>
+  <div class="settings-panel" id="settings-panel" role="dialog" aria-label="Accessibility settings" hidden>
+    <h2>Accessibility settings</h2>
+    <div class="row"><button class="btn secondary" id="size-down" type="button" aria-label="Decrease text size">A-</button><button class="btn secondary" id="size-up" type="button" aria-label="Increase text size">A+</button></div>
+    <div class="row"><button class="btn" id="hc-toggle" type="button" aria-pressed="false">High contrast</button><button class="btn" id="font-toggle" type="button" aria-pressed="false">Readable font</button></div>
+    <p>Press Escape to close.</p>
+  </div>
+</header>
+<main id="main">
+<div class="page-title"><h1>Self-Care</h1></div>
+<div class="grid"><article class="card"><h2>Sleep</h2><p>Keep a regular bedtime and put screens away before sleeping.</p></article><article class="card"><h2>Move</h2><p>A short walk outside can lift your mood.</p></article><article class="card"><h2>Connect</h2><p>Talk to a friend, family member or teacher you trust.</p></article><article class="card"><h2>Breathe</h2><p>Slow breathing calms the body. <a href="breathing.html">Try it now</a>.</p></article></div>
+<div class="figure-grid"><figure><img class="pic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDAwIj48bGluZWFyR3JhZGllbnQgaWQ9Imc5IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZlM2MyIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZmZmNmU4Ii8+PC9saW5lYXJHcmFkaWVudD4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9InVybCgjZzkpIi8+CjxlbGxpcHNlIGN4PSIxNjAiIGN5PSI4NSIgcng9IjYyIiByeT0iMjYiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii45Ii8+PGVsbGlwc2UgY3g9IjIwOCIgY3k9Ijk2IiByeD0iNDYiIHJ5PSIyMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjkiLz4KPGVsbGlwc2UgY3g9IjYyMCIgY3k9IjY2IiByeD0iNTIiIHJ5PSIyMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjg1Ii8+CjxwYXRoIGQ9Ik0wIDI5MCBRMTIwIDIyMCAyNjAgMjgwIFQ1MjAgMjcwIFQ4MDAgMjU1IFY0MDAgSDBaIiBmaWxsPSIjY2RlMjhmIi8+PHBhdGggZD0iTTAgMzAwIFEyMDAgMzQwIDQyMCAzMTAgVDgwMCAzMDAgVjMyMCBRNjAwIDM1MCA0MjAgMzMwIFQwIDMyMloiIGZpbGw9IiNlOWQ5YjUiLz4KPHBhdGggZD0iTTAgMzQ1IFExNjAgMjk1IDMzMCAzNDAgVDYyMCAzMzUgVDgwMCAzMjIgVjQwMCBIMFoiIGZpbGw9IiM4YmE5MTAiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MDAgMzE4KSBzY2FsZSgxLjQpIj48Y2lyY2xlIGN4PSIwIiBjeT0iLTM4IiByPSIxMyIgZmlsbD0iI2YyYzlhMCIvPjxwYXRoIGQ9Ik0tMTggMCBRLTE4IC0yNiAwIC0yNiBRMTggLTI2IDE4IDBaIiBmaWxsPSIjZTA3YTNmIi8+PC9nPjxwYXRoIGQ9Ik0zODggMzMwbC04IDE4TTQxMiAzMzBsOCAxOCIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExMCAyOTUpIHNjYWxlKDEuMCkiPjxyZWN0IHg9Ii00IiB5PSIwIiB3aWR0aD0iOCIgaGVpZ2h0PSIyMiIgZmlsbD0iIzZiNGEyYiIvPjxwYXRoIGQ9Ik0wIC03MCBMMjYgLTI2IEgtMjZaIE0wIC00OCBMMzIgNCBILTMyWiIgZmlsbD0iIzJmNmIzYSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2OTAgMjk4KSBzY2FsZSgxLjEpIj48cmVjdCB4PSItNCIgeT0iMCIgd2lkdGg9IjgiIGhlaWdodD0iMjIiIGZpbGw9IiM2YjRhMmIiLz48cGF0aCBkPSJNMCAtNzAgTDI2IC0yNiBILTI2WiBNMCAtNDggTDMyIDQgSC0zMloiIGZpbGw9IiMyZjZiM2EiLz48L2c+PC9zdmc+" alt="Illustration of a person walking on a path through hills" width="800" height="400" loading="lazy"><figcaption>A morning walk can help.</figcaption></figure><figure><img class="pic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDAwIj48bGluZWFyR3JhZGllbnQgaWQ9ImcxMCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2NmZDlmNyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2VlZjFmZiIvPjwvbGluZWFyR3JhZGllbnQ+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiBmaWxsPSJ1cmwoI2cxMCkiLz4KPGVsbGlwc2UgY3g9IjE2MCIgY3k9Ijg1IiByeD0iNjIiIHJ5PSIyNiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjkiLz48ZWxsaXBzZSBjeD0iMjA4IiBjeT0iOTYiIHJ4PSI0NiIgcnk9IjIyIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuOSIvPgo8ZWxsaXBzZSBjeD0iNjIwIiBjeT0iNjYiIHJ4PSI1MiIgcnk9IjIyIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuODUiLz4KPHBhdGggZD0iTTAgMjkwIFExMjAgMjIwIDI2MCAyODAgVDUyMCAyNzAgVDgwMCAyNTUgVjQwMCBIMFoiIGZpbGw9IiNiNWQxN2YiLz48Y2lyY2xlIGN4PSI2NDAiIGN5PSI4MCIgcj0iMzYiIGZpbGw9IiNmZmY2YzkiLz48Y2lyY2xlIGN4PSI2NTQiIGN5PSI3MiIgcj0iMzIiIGZpbGw9IiNjZmQ5ZjciLz4KPHBhdGggZD0iTTAgMzQ1IFExNjAgMjk1IDMzMCAzNDAgVDYyMCAzMzUgVDgwMCAzMjIgVjQwMCBIMFoiIGZpbGw9IiM3Njk2MWEiLz48ZyBmaWxsPSIjZmZmNmM5Ij48Y2lyY2xlIGN4PSIxMjAiIGN5PSI2MCIgcj0iMyIvPjxjaXJjbGUgY3g9IjMwMCIgY3k9IjQwIiByPSIzIi8+PGNpcmNsZSBjeD0iNDcwIiBjeT0iNzUiIHI9IjMiLz48Y2lyY2xlIGN4PSI1NjAiIGN5PSIzNSIgcj0iMyIvPjwvZz48cmVjdCB4PSIzMDAiIHk9IjMwMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyNiIgcng9IjEyIiBmaWxsPSIjYzlkMWRiIi8+PHJlY3QgeD0iMzEwIiB5PSIyODUiIHdpZHRoPSI3MCIgaGVpZ2h0PSIxOCIgcng9IjkiIGZpbGw9IiNmZmYiLz48L3N2Zz4=" alt="Illustration of hills under a night sky with a moon" width="800" height="400" loading="lazy"><figcaption>Rest is part of health.</figcaption></figure></div>
+</main>
+<footer class="site-footer">
+  <nav aria-label="Footer navigation"><ul><li><a href="index.html">Home</a></li><li><a href="service.html">Appointment</a></li><li><a href="crisis.html">Crisis support</a></li><li><a href="videos.html">Videos</a></li><li><a href="faq.html">FAQ</a></li><li><a href="accessibility.html">Accessibility</a></li><li><a href="contact.html">Contact</a></li><li><a href="references.html">References</a></li></ul></nav>
+  <p>MindBridge PH: a student project for HUMCOM 1, aligned with UN SDG 11.</p>
+  <p>This site gives information only and is not a substitute for professional care.</p>
+</footer>
+<script>
+/* ==========================================================
+   MindBridge PH - shared script (basic JavaScript only)
+   1. Mobile menu toggle
+   2. Settings panel: high contrast, text size, readable font
+   3. Service page: district list, facility list, calendar booking
+   4. Breathing exercise
+   ========================================================== */
+
+(function () {
+  "use strict";
+
+  /* ---------- safe storage helpers ---------- */
+  function save(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  /* ---------- 1. Mobile menu ---------- */
+  var toggle = document.querySelector(".menu-toggle");
+  var navList = document.getElementById("main-nav");
+  if (toggle && navList) {
+    toggle.addEventListener("click", function () {
+      var open = navList.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+  }
+
+  /* ---------- 2. Settings panel ---------- */
+  var gear = document.getElementById("settings-btn");
+  var panel = document.getElementById("settings-panel");
+  var hcBtn = document.getElementById("hc-toggle");
+  var fontBtn = document.getElementById("font-toggle");
+  var sizeUp = document.getElementById("size-up");
+  var sizeDown = document.getElementById("size-down");
+  var root = document.documentElement;
+  var size = parseInt(load("mb-size") || "1", 10);
+
+  function applySize() {
+    root.classList.remove("fs-2", "fs-3");
+    if (size === 2) root.classList.add("fs-2");
+    if (size === 3) root.classList.add("fs-3");
+    save("mb-size", String(size));
+  }
+  function applyHC(on) {
+    document.body.classList.toggle("hc", on);
+    if (hcBtn) hcBtn.setAttribute("aria-pressed", String(on));
+    save("mb-hc", on ? "1" : "0");
+  }
+  function applyFont(on) {
+    document.body.classList.toggle("dyslexic", on);
+    if (fontBtn) fontBtn.setAttribute("aria-pressed", String(on));
+    save("mb-font", on ? "1" : "0");
+  }
+  applySize();
+  applyHC(load("mb-hc") === "1");
+  applyFont(load("mb-font") === "1");
+
+  if (gear && panel) {
+    gear.addEventListener("click", function () {
+      var hidden = panel.hasAttribute("hidden");
+      if (hidden) panel.removeAttribute("hidden"); else panel.setAttribute("hidden", "");
+      gear.setAttribute("aria-expanded", String(hidden));
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !panel.hasAttribute("hidden")) {
+        panel.setAttribute("hidden", "");
+        gear.setAttribute("aria-expanded", "false");
+        gear.focus();
+      }
+    });
+  }
+  if (hcBtn) hcBtn.addEventListener("click", function () { applyHC(!document.body.classList.contains("hc")); });
+  if (fontBtn) fontBtn.addEventListener("click", function () { applyFont(!document.body.classList.contains("dyslexic")); });
+  if (sizeUp) sizeUp.addEventListener("click", function () { size = Math.min(3, size + 1); applySize(); });
+  if (sizeDown) sizeDown.addEventListener("click", function () { size = Math.max(1, size - 1); applySize(); });
+
+  /* ---------- 3. Service page ---------- */
+  var districtNav = document.getElementById("district-nav");
+  if (districtNav) {
+    /* Districts and barangays follow the list supplied by the project author. A facility is shown only in the barangay or area its own address names;
+       the rest are under City-wide services. Sources: references.html (verified November 2026). */
+    var F = {
+      mines: { n: "Mines View Health Center", a: "Corner Torres Street, Mines View, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Tue and Fri, 8:00 AM to 11:50 AM, except holidays. Phone listed in 2020: (074) 665-8702. Ask about mental health consultation or referral, and call to confirm." },
+      pacdal: { n: "Pacdal Health Center", a: "Siapno Road, Pacdal, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon and Wed, morning only. Phone listed in 2020: (074) 665-8104. Ask about mental health consultation or referral, and call to confirm." },
+      engr: { n: "Engineers Hill Health Center", a: "Upper Engineers Hill, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon to Fri, 1:00 PM to 4:00 PM, except holidays. Phone listed in 2020: (074) 442-0100. Ask about mental health consultation or referral, and call to confirm." },
+      scout: { n: "Scout Barrio Health Center", a: "Purok 6, Scout Barrio, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon to Fri, 1:00 PM to 3:00 PM, except holidays. Phone listed in 2020: (074) 422-4512. Ask about mental health consultation or referral, and call to confirm." },
+      citycamp: { n: "City Camp Health Center", a: "City Camp Central, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon and Wed, 8:00 AM to 12:00 NN, except holidays. Phone listed in 2020: (074) 665-2902. Ask about mental health consultation or referral, and call to confirm." },
+      campo: { n: "Campo Filipino Health Center", a: "Bado Dangwa Street, Campo Filipino, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Tue and Fri, morning only. Phone listed in 2020: (074) 442-0031. Ask about mental health consultation or referral, and call to confirm." },
+      pinsao: { n: "Pinsao Health Center", a: "Purok 6, Pinsao Pilot Project, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon and Wed, morning only. Phone listed in 2020: (074) 665-7806. Ask about mental health consultation or referral, and call to confirm." },
+      quirino: { n: "Quirino Hill Health Center", a: "Middle Quirino Hill, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon to Fri, 8:00 AM to 10:00 AM, except holidays. Phone listed in 2020: (074) 620-5338. Ask about mental health consultation or referral, and call to confirm." },
+      atoktrail: { n: "Atok Trail Health Center", a: "#01 Atok Trail, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon and Wed, 8:00 AM to 10:30 AM. Phone listed in 2020: (074) 620-5395. Ask about mental health consultation or referral, and call to confirm." },
+      loakan: { n: "Loakan Health Center", a: "#37 Purok Bubon, Loakan Proper, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Tue and Fri (hours not listed), except holidays. Phone listed in 2020: (074) 665-8761. Ask about mental health consultation or referral, and call to confirm." },
+      atab: { n: "Atab Health Center", a: "Sto. Tomas Road, Dontogan, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon to Fri, 2:00 PM to 4:00 PM. Phone listed in 2020: (074) 420-9087. Ask about mental health consultation or referral, and call to confirm." },
+      asin: { n: "Asin Health Center", a: "Pacday Quinio Drive, Upper Purok 3, Km 4 Asin Road, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon to Fri, 1:00 PM to 4:00 PM, except holidays. Phone listed in 2020: (074) 620-4798. Ask about mental health consultation or referral, and call to confirm." },
+      irisan: { n: "Irisan Health Center", a: "Purok 12, Irisan, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon to Fri, 8:00 AM to 11:00 AM, except holidays. Phone listed in 2020: (074) 442-0102. Ask about mental health consultation or referral, and call to confirm." },
+      quezon: { n: "Quezon Hill Health Center", a: "Middle Quezon Hill, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon to Fri, 8:00 AM to 10:00 AM. Phone listed in 2020: (074) 620-5469. Ask about mental health consultation or referral, and call to confirm." },
+      lucban: { n: "Lucban Health Center", a: "T. Alonzo St., Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon to Fri, 8:00 AM to 12:00 NN, except holidays. Phone listed in 2020: (074) 300-6065. Ask about mental health consultation or referral, and call to confirm." },
+      aurora: { n: "Aurora Hill Health Center", a: "#01 Malvar St., Aurora Hill Proper, Baguio City", t: "District health center of the City Health Services Office. Hours listed by the city in 2020 (for medical certificates): Mon to Fri, 8:00 AM to 12:00 NN, except holidays. Phone listed in 2020: (074) 665-7772. Ask about mental health consultation or referral, and call to confirm." },
+      wellness: { n: "Baguio City Health Services Office: Wellness Clinic", a: "T. Alonzo, Lucban, Baguio City", t: "Consultation, counseling or therapy, medication. Hours not published; contact the Mental Health and Wellness Unit at 0919-069-6361 (number published by PIA in 2023, so confirm it first)." },
+      bghmc: { n: "Baguio General Hospital and Medical Center", a: "Gov. Pack Road, BGH Compound, Baguio City 2600", t: "Public (Department of Health) hospital. Listed services: emergency care, consultation, counseling or therapy, psychological assessment, in-patient admission and medication, with a psychiatry complex. Listed as free and PhilHealth accredited. Call the hospital to confirm clinic schedules." },
+      bmc: { n: "Baguio Medical Center", a: "#9 Military Cut-Off, Baguio City", t: "Private hospital. Ask whether a psychiatrist, psychologist or counselor is available. Call the hospital to confirm." },
+      ndch: { n: "Notre Dame de Chartres Hospital", a: "25 General Luna Road, Baguio City", t: "Private hospital. Ask whether a psychiatrist, psychologist or counselor is available. Call the hospital to confirm." },
+      pines: { n: "Pines City Doctors' Hospital", a: "16 Magsaysay Avenue, Baguio City", t: "Private hospital. Ask whether a psychiatrist, psychologist or counselor is available. Call the hospital to confirm." },
+      slu: { n: "Saint Louis University Hospital of the Sacred Heart", a: "Assumption Road, Baguio City", t: "Private hospital. Ask whether a psychiatrist, psychologist or counselor is available. Call the hospital to confirm." },
+      upb: { n: "UP Baguio Office of Counseling and Guidance", a: "Lower Ground, Balay Salun-at Building, University of the Philippines Baguio", t: "For UP Baguio students and personnel: intake interview and counseling, follow-up counseling, walk-in cases and referrals. Email ocg.upbaguio@up.edu.ph." },
+      ub: { n: "University of Baguio Center for Counseling and Student Development", a: "University of Baguio, General Luna Road, Baguio City", t: "Support for the mental, emotional, social and moral development of students. Mon to Sat, 8:00 AM to 5:00 PM; telephone (074) 442-3036." },
+      pmha: { n: "Philippine Mental Health Association, Cordillera Chapter", a: "BGH Exit Road, Marcos Highway, Baguio City", t: "Consultation, counseling or therapy, psychological assessment, training and information. Opening hours are not clear in the public directory; call ahead before visiting." },
+    };
+    var DATA = [
+      { name: "District 1", places: [
+        { n: "Gibraltar", f: [] },
+        { n: "Mines View", f: [F.mines] },
+        { n: "Pacdal", f: [F.pacdal] },
+        { n: "Pucsusan", f: [] },
+        { n: "St. Joseph Village", f: [] }
+      ]},
+      { name: "District 2", places: [
+        { n: "Cabinet Hill", f: [] },
+        { n: "DPS Compound", f: [] },
+        { n: "Engineer's Hill", f: [F.engr] },
+        { n: "Marcoville", f: [] },
+        { n: "Greenwater Village", f: [] }
+      ]},
+      { name: "District 3", places: [
+        { n: "Gabriela Silang", f: [] },
+        { n: "Hillside", f: [] },
+        { n: "Lower Dagsian", f: [] },
+        { n: "Santa Escolastica Village", f: [] },
+        { n: "Upper Dagsian", f: [] },
+        { n: "Scout Barrio", f: [F.scout] }
+      ]},
+      { name: "District 4", places: [
+        { n: "Baguio General Hospital Compound", f: [F.bghmc] },
+        { n: "Balsigan", f: [] },
+        { n: "Burnham Legarda Kisad", f: [] },
+        { n: "Imelda Marcos (La Salle)", f: [] },
+        { n: "Phil-Am", f: [] },
+        { n: "Santo Rosario", f: [] },
+        { n: "Ferdinand (Happy Homes-Campo Sioco)", f: [] }
+      ]},
+      { name: "District 5", places: [
+        { n: "City Camp Central", f: [F.citycamp] },
+        { n: "City Camp Proper", f: [] },
+        { n: "General Emilio Aguinaldo (Lower Quirino Magsaysay)", f: [] },
+        { n: "Lower Rock Quarry", f: [] },
+        { n: "Middle Rock Quarry", f: [] },
+        { n: "Palma Urbano (Cari\u00f1o-Palma)", f: [] },
+        { n: "Upper Quirino Magsaysay (Upper QM)", f: [] },
+        { n: "Upper Rock Quarry", f: [] }
+      ]},
+      { name: "District 6", places: [
+        { n: "Andres Bonifacio (Lower Bokawkan)", f: [] },
+        { n: "Camp Allen", f: [] },
+        { n: "Campo Filipino", f: [F.campo] },
+        { n: "Fairview", f: [] },
+        { n: "Kayang Extension", f: [] },
+        { n: "MRR Queen of Peace", f: [] },
+        { n: "Upper Market Subdivision", f: [] }
+      ]},
+      { name: "District 7", places: [
+        { n: "Central Guisad", f: [] },
+        { n: "Crescencia Village", f: [] },
+        { n: "Guisad Surong", f: [] },
+        { n: "Lower Magsaysay", f: [] },
+        { n: "Padre Burgos", f: [] },
+        { n: "Padre Zamora", f: [] },
+        { n: "Pinsao Pilot Project", f: [F.pinsao] },
+        { n: "Slaughter (Sto. Ni\u00f1o)", f: [] }
+      ]},
+      { name: "District 8", places: [
+        { n: "Camdas Subdivision", f: [] },
+        { n: "Dizon Subdivision", f: [] },
+        { n: "East Quirino Hill", f: [] },
+        { n: "Happy Homes Old Lucban", f: [] },
+        { n: "Lower Quirino Hill", f: [] },
+        { n: "Middle Quirino Hill", f: [F.quirino] },
+        { n: "Pinget", f: [] },
+        { n: "West Quirino Hill", f: [] }
+      ]},
+      { name: "District 9", places: [
+        { n: "Ambiong", f: [] },
+        { n: "Bayan Park Village", f: [] },
+        { n: "Bayan Park East", f: [] },
+        { n: "North Central Aurora Hill", f: [] },
+        { n: "San Antonio Village", f: [] },
+        { n: "South Central Aurora Hill", f: [] },
+        { n: "Bayan Park West (Bayan Park)", f: [] }
+      ]},
+      { name: "District 10", places: [
+        { n: "Harrison-Claudio Carantes", f: [] },
+        { n: "Lower General Luna", f: [] },
+        { n: "Malcolm Square - Perfecto (Jose Abad Santos)", f: [] },
+        { n: "Salud Mitra", f: [] },
+        { n: "Session Road Area", f: [] },
+        { n: "Upper General Luna Road", f: [] }
+      ]},
+      { name: "District 11", places: [
+        { n: "Country Club Village", f: [] },
+        { n: "Happy Hollow", f: [] },
+        { n: "Lualhati", f: [] },
+        { n: "Lucnab", f: [] },
+        { n: "Outlook Drive", f: [] },
+        { n: "South Drive", f: [] }
+      ]},
+      { name: "District 12", places: [
+        { n: "Atok Trail", f: [F.atoktrail] },
+        { n: "Fort Del Pilar", f: [] },
+        { n: "Kias", f: [] },
+        { n: "Loakan Apugan", f: [] },
+        { n: "Loakan Liwanag", f: [] },
+        { n: "Loakan Proper", f: [F.loakan] }
+      ]},
+      { name: "District 13", places: [
+        { n: "Camp 7", f: [] },
+        { n: "Camp 8", f: [] },
+        { n: "Military Cut-off", f: [F.bmc] },
+        { n: "Poliwes", f: [] },
+        { n: "San Vicente", f: [] }
+      ]},
+      { name: "District 14", places: [
+        { n: "Bakakeng Central", f: [] },
+        { n: "Bakakeng Norte", f: [] },
+        { n: "Dontogan", f: [F.atab] },
+        { n: "SLU / SVP Housing Village", f: [] },
+        { n: "Sto. Tomas School Area", f: [] },
+        { n: "Santo Tomas Proper", f: [] }
+      ]},
+      { name: "District 15", places: [
+        { n: "Asin", f: [F.asin] },
+        { n: "Dominican Mirador", f: [] },
+        { n: "Lourdes Subdivision Ext.", f: [] },
+        { n: "Lourdes Subdivision Proper", f: [] },
+        { n: "Lower Lourdes Subdivision", f: [] },
+        { n: "San Luis Village", f: [] },
+        { n: "San Roque Village", f: [] }
+      ]},
+      { name: "District 16", places: [
+        { n: "Irisan", f: [F.irisan] },
+        { n: "Middle Quezon Hill Subd.", f: [F.quezon] },
+        { n: "Pinsao Proper", f: [] },
+        { n: "Quezon Hill Proper", f: [] },
+        { n: "Upper Quezon Hill", f: [] },
+        { n: "Victoria Village", f: [] }
+      ]},
+      { name: "District 17", places: [
+        { n: "Alfonso Tabora", f: [] },
+        { n: "Magsaysay Private Road", f: [] },
+        { n: "New Lucban", f: [] },
+        { n: "North Sanitary Camp", f: [] },
+        { n: "South Sanitary Camp", f: [] },
+        { n: "Trancoville", f: [] }
+      ]},
+      { name: "District 18", places: [
+        { n: "Andres Bonifacio - Caguioa Rimando (ABCR)", f: [] },
+        { n: "Abanao-Zandueta-Chugum-Kayang Otek (AZKCO)", f: [] },
+        { n: "Bagong Lipunan (Market Area)", f: [] },
+        { n: "Kagitingan", f: [] },
+        { n: "Kayang Hilltop", f: [] },
+        { n: "Rizal Monument Area", f: [] },
+        { n: "Teodora Alonzo", f: [F.lucban, F.wellness] },
+        { n: "Upper Magsaysay", f: [] },
+        { n: "Kabayanihan", f: [] }
+      ]},
+      { name: "District 19", places: [
+        { n: "Aurora Hill Proper (Malvar-Sgt. Floresca)", f: [F.aurora] },
+        { n: "Brookside", f: [] },
+        { n: "Brookspoint", f: [] },
+        { n: "East Modern Site", f: [] },
+        { n: "Lopez Jaena", f: [] },
+        { n: "West Modern Site", f: [] }
+      ]},
+      { name: "District 20", places: [
+        { n: "Holyghost Extension", f: [] },
+        { n: "Holyghost Proper", f: [] },
+        { n: "Honeymoon (Honeymoon-Holyghost)", f: [] },
+        { n: "Manuel Roxas", f: [] },
+        { n: "Imelda Village", f: [] }
+      ]},
+      { name: "City-wide services", places: [
+        { n: "Notre Dame de Chartres Hospital", f: [F.ndch] },
+        { n: "Pines City Doctors' Hospital", f: [F.pines] },
+        { n: "Saint Louis University Hospital of the Sacred Heart", f: [F.slu] },
+        { n: "UP Baguio Office of Counseling and Guidance", f: [F.upb] },
+        { n: "University of Baguio Center for Counseling and Student Development", f: [F.ub] },
+        { n: "Philippine Mental Health Association, Cordillera Chapter", f: [F.pmha] }
+      ]}
+    ];
+
+    var resultsTitle = document.getElementById("results-title");
+    var facilityList = document.getElementById("facility-list");
+    var bookPlace = document.getElementById("book-place");
+    var params = new URLSearchParams(window.location.search);
+    var startG = parseInt(params.get("g"), 10);
+    if (!(startG >= 0 && startG < DATA.length)) startG = 0;
+    var startP = parseInt(params.get("p"), 10);
+    if (!(startP >= 0 && startP < DATA[startG].places.length)) startP = 0;
+    var current = { district: startG, place: startP };
+
+    function renderFacilities() {
+      var dist = DATA[current.district];
+      var place = dist.places[current.place];
+      resultsTitle.textContent = dist.name + ": " + place.n;
+      facilityList.innerHTML = "";
+      if (!place.f.length) {
+        var none = document.createElement("article");
+        none.className = "facility";
+        var nh = document.createElement("h3"); nh.textContent = place.n;
+        var np = document.createElement("p");
+        np.textContent = "No health facility in this directory is located in this barangay or area. Call a hotline above if you need help now.";
+        none.appendChild(nh); none.appendChild(np);
+        facilityList.appendChild(none);
+      }
+      place.f.forEach(function (p) {
+        var art = document.createElement("article");
+        art.className = "facility";
+        var h = document.createElement("h3"); h.textContent = p.n;
+        var a = document.createElement("p"); a.textContent = "Address: " + p.a;
+        var t = document.createElement("p"); t.textContent = "Details: " + p.t;
+        var img = document.createElement("img"); img.className = "pic small";
+        img.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDAwIj48bGluZWFyR3JhZGllbnQgaWQ9Imc3IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjY2ZlYWZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZjJmYWZmIi8+PC9saW5lYXJHcmFkaWVudD4KPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9InVybCgjZzcpIi8+CjxlbGxpcHNlIGN4PSIxNjAiIGN5PSI4NSIgcng9IjYyIiByeT0iMjYiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii45Ii8+PGVsbGlwc2UgY3g9IjIwOCIgY3k9Ijk2IiByeD0iNDYiIHJ5PSIyMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjkiLz4KPGVsbGlwc2UgY3g9IjYyMCIgY3k9IjY2IiByeD0iNTIiIHJ5PSIyMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjg1Ii8+CjxwYXRoIGQ9Ik0wIDI5MCBRMTIwIDIyMCAyNjAgMjgwIFQ1MjAgMjcwIFQ4MDAgMjU1IFY0MDAgSDBaIiBmaWxsPSIjYzNkZThiIi8+CjxwYXRoIGQ9Ik0wIDM0NSBRMTYwIDI5NSAzMzAgMzQwIFQ2MjAgMzM1IFQ4MDAgMzIyIFY0MDAgSDBaIiBmaWxsPSIjODZhNTAwIi8+PHJlY3QgeD0iMjkwIiB5PSIxOTAiIHdpZHRoPSIyMjAiIGhlaWdodD0iMTMwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiMxZjNhNWYiIHN0cm9rZS13aWR0aD0iNSIvPjxyZWN0IHg9IjM4MCIgeT0iMjYwIiB3aWR0aD0iNDAiIGhlaWdodD0iNjAiIGZpbGw9IiNjOWQxZGIiLz48cmVjdCB4PSIzODgiIHk9IjIwNSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjQ2IiBmaWxsPSIjYzk2ZjdhIi8+PHJlY3QgeD0iMzc3IiB5PSIyMTYiIHdpZHRoPSI0NiIgaGVpZ2h0PSIyNCIgZmlsbD0iI2M5NmY3YSIvPjxyZWN0IHg9IjMxMCIgeT0iMjE1IiB3aWR0aD0iNDAiIGhlaWdodD0iMzQiIGZpbGw9IiNiZmU2ZmQiLz48cmVjdCB4PSI0NTAiIHk9IjIxNSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjM0IiBmaWxsPSIjYmZlNmZkIi8+PC9zdmc+";
+        img.alt = "Illustration of a health building among green hills for " + p.n;
+        img.width = 280; img.height = 140;
+        art.appendChild(h); art.appendChild(a); art.appendChild(t); art.appendChild(img);
+        facilityList.appendChild(art);
+      });
+      if (current.district !== DATA.length - 1) {
+        var tip = document.createElement("p"); tip.className = "note";
+        tip.textContent = "Need a hospital or a counseling office? Open \"City-wide services\" at the bottom of the list on the left.";
+        facilityList.appendChild(tip);
+      }
+      bookPlace.textContent = place.f.length ? place.f.map(function (f) { return f.n; }).join(" / ") : "No facility listed in this barangay";
+    }
+
+    function selectPlace(i, j) {
+      current.district = i; current.place = j;
+      districtNav.querySelectorAll(".place-list button").forEach(function (b) { b.removeAttribute("aria-current"); });
+      var target = document.getElementById("place-" + i + "-" + j);
+      if (target) target.setAttribute("aria-current", "true");
+      renderFacilities();
+    }
+
+    function buildNav() {
+      DATA.forEach(function (dist, i) {
+        var li = document.createElement("li");
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "district-btn";
+        btn.setAttribute("aria-expanded", i === startG ? "true" : "false");
+        btn.setAttribute("aria-controls", "places-" + i);
+        btn.innerHTML = '<span class="chev" aria-hidden="true">&#9656;</span> ' + dist.name;
+        var ul = document.createElement("ul");
+        ul.className = "place-list"; ul.id = "places-" + i;
+        if (i !== startG) ul.hidden = true;
+        dist.places.forEach(function (p, j) {
+          var pli = document.createElement("li");
+          var pb = document.createElement("button");
+          pb.type = "button"; pb.id = "place-" + i + "-" + j;
+          pb.textContent = p.n;
+          if (i === startG && j === startP) pb.setAttribute("aria-current", "true");
+          pb.addEventListener("click", function () { selectPlace(i, j); });
+          pli.appendChild(pb); ul.appendChild(pli);
+        });
+        btn.addEventListener("click", function () {
+          var open = btn.getAttribute("aria-expanded") === "true";
+          btn.setAttribute("aria-expanded", String(!open));
+          ul.hidden = open;
+          if (!open) selectPlace(i, 0);
+        });
+        li.appendChild(btn); li.appendChild(ul);
+        districtNav.appendChild(li);
+      });
+    }
+    buildNav();
+    renderFacilities();
+
+    /* Search bar filters districts and barangays, and opens the matching districts */
+    var filter = document.getElementById("site-search");
+    if (filter) {
+      filter.addEventListener("input", function () {
+        var q = filter.value.trim().toLowerCase();
+        districtNav.querySelectorAll(":scope > li").forEach(function (li) {
+          var match = q === "" || li.textContent.toLowerCase().indexOf(q) !== -1;
+          li.hidden = !match;
+          if (q !== "" && match) {
+            li.querySelector(".district-btn").setAttribute("aria-expanded", "true");
+            li.querySelector(".place-list").hidden = false;
+          }
+        });
+      });
+    }
+
+    /* Calendar */
+    var calGrid = document.getElementById("cal-grid");
+    var calLabel = document.getElementById("cal-label");
+    var today = new Date();
+    var view = new Date(today.getFullYear(), today.getMonth(), 1);
+    var chosenDate = null, chosenTime = null;
+    var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+    function drawCal() {
+      calGrid.innerHTML = "";
+      calLabel.textContent = MONTHS[view.getMonth()] + " " + view.getFullYear();
+      ["S","M","T","W","T","F","S"].forEach(function (d) {
+        var s = document.createElement("span"); s.className = "dow"; s.textContent = d; calGrid.appendChild(s);
+      });
+      for (var b = 0; b < view.getDay(); b++) calGrid.appendChild(document.createElement("span"));
+      var days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+      for (var d = 1; d <= days; d++) {
+        (function (day) {
+          var date = new Date(view.getFullYear(), view.getMonth(), day);
+          var btn = document.createElement("button");
+          btn.type = "button"; btn.textContent = day;
+          btn.setAttribute("aria-label", MONTHS[date.getMonth()] + " " + day + ", " + date.getFullYear());
+          var past = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          if (past) btn.disabled = true;
+          var isChosen = chosenDate && chosenDate.getTime() === date.getTime();
+          btn.setAttribute("aria-pressed", String(!!isChosen));
+          btn.addEventListener("click", function () { chosenDate = date; drawCal(); });
+          calGrid.appendChild(btn);
+        })(d);
+      }
+    }
+    document.getElementById("cal-prev").addEventListener("click", function () { view.setMonth(view.getMonth() - 1); drawCal(); });
+    document.getElementById("cal-next").addEventListener("click", function () { view.setMonth(view.getMonth() + 1); drawCal(); });
+    drawCal();
+
+    /* Reads a time the user typed: 3:30 PM, 3pm, 9.15 a.m., or 24-hour such as 15:30. */
+    function parseTypedTime(raw) {
+      var s = raw.trim().toLowerCase().replace(/\s+/g, " ");
+      if (!s) return { error: "Please type the time you prefer, for example 3:30 PM." };
+      var m = /^(\d{1,2})(?:[:.](\d{2}))?\s*(a\.?m?\.?|p\.?m?\.?)?$/.exec(s);
+      if (!m) return { error: "I could not read that time. Try 3:30 PM, 9am, or 15:30." };
+      var h = parseInt(m[1], 10), min = m[2] ? parseInt(m[2], 10) : 0, ap = m[3] ? m[3].charAt(0) : null;
+      if (min > 59) return { error: "Minutes must be between 00 and 59." };
+      if (ap) {
+        if (h < 1 || h > 12) return { error: "With AM or PM, the hour must be 1 to 12." };
+        var hr = h % 12 + (ap === "p" ? 12 : 0);
+      } else {
+        if (h > 23) return { error: "The hour must be between 0 and 23." };
+        if (h >= 1 && h <= 12) return { error: "Please add AM or PM, for example " + h + ":" + (min < 10 ? "0" : "") + min + " PM." };
+        var hr = h;
+      }
+      var shown = (hr % 12 === 0 ? 12 : hr % 12) + ":" + (min < 10 ? "0" : "") + min + (hr >= 12 ? " PM" : " AM");
+      return { label: shown };
+    }
+
+    document.getElementById("make-appt").addEventListener("click", function () {
+      var status = document.getElementById("appt-status");
+      var timeBox = document.getElementById("appt-time");
+      if (!chosenDate) {
+        status.textContent = "Please choose a date first.";
+        return;
+      }
+      var parsed = parseTypedTime(timeBox.value);
+      if (parsed.error) {
+        timeBox.setAttribute("aria-invalid", "true");
+        status.textContent = parsed.error;
+        timeBox.focus();
+        return;
+      }
+      timeBox.removeAttribute("aria-invalid");
+      chosenTime = parsed.label;
+      timeBox.value = parsed.label;
+      if (!DATA[current.district].places[current.place].f.length) {
+        status.textContent = "Please choose a barangay or area that has a listed facility.";
+        return;
+      }
+      status.textContent = "Request saved for " + MONTHS[chosenDate.getMonth()] + " " + chosenDate.getDate() +
+        ", " + chosenDate.getFullYear() + " at " + chosenTime + ". This is a demonstration; no real booking is made.";
+    });
+  }
+
+  /* ---------- 4. Breathing exercise ---------- */
+  var breathBtn = document.getElementById("breath-start");
+  var circle = document.getElementById("breath-circle");
+  var breathText = document.getElementById("breath-text");
+  if (breathBtn && circle) {
+    var timer = null, inhale = true;
+    function step() {
+      inhale = !inhale;
+      circle.classList.toggle("expand", inhale);
+      breathText.textContent = inhale ? "Breathe in" : "Breathe out";
+    }
+    breathBtn.addEventListener("click", function () {
+      if (timer) {
+        clearInterval(timer); timer = null;
+        circle.classList.remove("expand");
+        breathText.textContent = "Ready";
+        breathBtn.textContent = "Start";
+        breathBtn.setAttribute("aria-pressed", "false");
+      } else {
+        inhale = false; step();
+        timer = setInterval(step, 4000);
+        breathBtn.textContent = "Stop";
+        breathBtn.setAttribute("aria-pressed", "true");
+      }
+    });
+  }
+})();
+
+</script>
+</body>
+</html>
